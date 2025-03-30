@@ -251,7 +251,7 @@ export default function MedicalLandingPage() {
                   </div>
                   <div>
                     <p className="mb-6 italic text-slate-600 text-lg leading-relaxed">
-                      "{testimonial.quote}"
+                      {testimonial.quote}
                     </p>
                   </div>
                   <div className="flex items-center gap-4 mt-6 pt-6 border-t border-blue-100">

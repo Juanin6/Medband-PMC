@@ -37,7 +37,7 @@ export default function ChatInterface() {
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-lg border-gray-200">
+    <Card className="w-full max-w-4xl mx-auto shadow-lg border-gray-200 mt-2">
       <CardHeader className="border-b bg-white">
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
