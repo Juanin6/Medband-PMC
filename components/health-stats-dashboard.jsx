@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Papa from "papaparse"
 import { Progress } from "@/components/ui/progress"
 import {
   Heart,
@@ -21,162 +20,72 @@ import {
 
 // Componente para mostrar estadísticas de salud de un usuario
 export default function HealthStatsDashboard({ userData }) {
-  const [userData, setUserData] = useState(null)
+  const [activeTab, setActiveTab] = useState("overview")
 
-  useEffect(() => {
-    Papa.parse("public/health_data.csv", {
-      download: true,
-      header: true, // asumiendo que sí tienes encabezados
-      complete: (results) => {
-        if (results.data && results.data.length > 0) {
-          // Tomamos la PRIMERA fila como ejemplo
-          const firstRow = results.data[0]
-
-          // Mapeamos esa fila a la estructura anidada
-          const transformed = transformRowToHealthData(firstRow)
-
-          setUserData(transformed)
-        }
-      },
-    })
-  }, [])
-
-  if (!userData) {
-    return <p>Cargando datos...</p>
-  }
-
-  return <HealthStatsDashboard userData={userData} />
-}
-
-// Aquí definimos la función que recibe el objeto 'row' (una fila del CSV)
-// y retorna un objeto con la forma EXACTA que espera el componente:
-function transformRowToHealthData(row) {
-  return {
-    name: row.name,
-    age: Number(row.age),
-    weight: Number(row.weight),
-    height: Number(row.height),
-    bmi: Number(row.bmi),
+  // Datos de ejemplo (en una aplicación real, estos vendrían de una API o props)
+  const healthData = userData || {
+    name: "Carlos Rodríguez",
+    age: 42,
+    weight: 78.5,
+    height: 175,
+    bmi: 25.6,
     bloodPressure: {
-      systolic: Number(row.bloodPressure_systolic),
-      diastolic: Number(row.bloodPressure_diastolic),
+      systolic: 122,
+      diastolic: 78,
       history: [
-        {
-          date: row.bp_hist_1_date,
-          systolic: Number(row.bp_hist_1_systolic),
-          diastolic: Number(row.bp_hist_1_diastolic),
-        },
-        {
-          date: row.bp_hist_2_date,
-          systolic: Number(row.bp_hist_2_systolic),
-          diastolic: Number(row.bp_hist_2_diastolic),
-        },
-        {
-          date: row.bp_hist_3_date,
-          systolic: Number(row.bp_hist_3_systolic),
-          diastolic: Number(row.bp_hist_3_diastolic),
-        },
-        {
-          date: row.bp_hist_4_date,
-          systolic: Number(row.bp_hist_4_systolic),
-          diastolic: Number(row.bp_hist_4_diastolic),
-        },
+        { date: "2023-03-01", systolic: 125, diastolic: 82 },
+        { date: "2023-03-08", systolic: 123, diastolic: 80 },
+        { date: "2023-03-15", systolic: 120, diastolic: 79 },
+        { date: "2023-03-22", systolic: 122, diastolic: 78 },
       ],
     },
     heartRate: {
-      current: Number(row.heartRate_current),
-      resting: Number(row.heartRate_resting),
-      max: Number(row.heartRate_max),
-      history: [
-        Number(row.hr_history_1),
-        Number(row.hr_history_2),
-        Number(row.hr_history_3),
-        Number(row.hr_history_4),
-        Number(row.hr_history_5),
-        Number(row.hr_history_6),
-      ],
+      current: 72,
+      resting: 68,
+      max: 142,
+      history: [68, 72, 75, 70, 68, 72],
     },
     sleep: {
-      average: Number(row.sleep_average),
-      deep: Number(row.sleep_deep),
-      light: Number(row.sleep_light),
-      rem: Number(row.sleep_rem),
-      history: [
-        Number(row.sleep_hist_1),
-        Number(row.sleep_hist_2),
-        Number(row.sleep_hist_3),
-        Number(row.sleep_hist_4),
-        Number(row.sleep_hist_5),
-        Number(row.sleep_hist_6),
-        Number(row.sleep_hist_7),
-      ],
+      average: 7.2,
+      deep: 2.1,
+      light: 4.2,
+      rem: 0.9,
+      history: [6.8, 7.5, 7.0, 7.2, 7.8, 6.5, 7.2],
     },
     activity: {
-      steps: Number(row.activity_steps),
-      stepsGoal: Number(row.activity_stepsGoal),
-      caloriesBurned: Number(row.activity_caloriesBurned),
-      caloriesGoal: Number(row.activity_caloriesGoal),
-      activeMinutes: Number(row.activity_activeMinutes),
-      activeMinutesGoal: Number(row.activity_activeMinutesGoal),
+      steps: 8742,
+      stepsGoal: 10000,
+      caloriesBurned: 420,
+      caloriesGoal: 500,
+      activeMinutes: 42,
+      activeMinutesGoal: 60,
     },
     hydration: {
-      current: Number(row.hydration_current),
-      goal: Number(row.hydration_goal),
-      history: [
-        Number(row.hydration_hist_1),
-        Number(row.hydration_hist_2),
-        Number(row.hydration_hist_3),
-        Number(row.hydration_hist_4),
-        Number(row.hydration_hist_5),
-        Number(row.hydration_hist_6),
-        Number(row.hydration_hist_7),
-      ],
+      current: 1.8,
+      goal: 2.5,
+      history: [1.5, 2.0, 1.7, 1.8, 2.2, 1.9, 1.8],
     },
     nutrition: {
-      calories: Number(row.nutrition_calories),
-      caloriesGoal: Number(row.nutrition_caloriesGoal),
-      protein: Number(row.nutrition_protein),
-      proteinGoal: Number(row.nutrition_proteinGoal),
-      carbs: Number(row.nutrition_carbs),
-      carbsGoal: Number(row.nutrition_carbsGoal),
-      fat: Number(row.nutrition_fat),
-      fatGoal: Number(row.nutrition_fatGoal),
+      calories: 1850,
+      caloriesGoal: 2000,
+      protein: 85,
+      proteinGoal: 100,
+      carbs: 220,
+      carbsGoal: 250,
+      fat: 65,
+      fatGoal: 70,
     },
-    medicalConditions: [
-      row.medicalCondition_1,
-      row.medicalCondition_2,
-    ],
+    medicalConditions: ["Hipertensión leve", "Colesterol elevado"],
     medications: [
-      {
-        name: row.meds_1_name,
-        dosage: row.meds_1_dosage,
-        frequency: row.meds_1_frequency,
-      },
-      {
-        name: row.meds_2_name,
-        dosage: row.meds_2_dosage,
-        frequency: row.meds_2_frequency,
-      },
+      { name: "Atorvastatina", dosage: "10mg", frequency: "Diaria" },
+      { name: "Losartán", dosage: "50mg", frequency: "Diaria" },
     ],
     recentMeasurements: [
-      {
-        date: row.recentMeas_1_date,
-        type: row.recentMeas_1_type,
-        value: row.recentMeas_1_value,
-      },
-      {
-        date: row.recentMeas_2_date,
-        type: row.recentMeas_2_type,
-        value: row.recentMeas_2_value,
-      },
-      {
-        date: row.recentMeas_3_date,
-        type: row.recentMeas_3_type,
-        value: row.recentMeas_3_value,
-      },
+      { date: "2023-03-22", type: "Presión arterial", value: "122/78" },
+      { date: "2023-03-22", type: "Glucosa", value: "98 mg/dL" },
+      { date: "2023-03-20", type: "Colesterol", value: "195 mg/dL" },
     ],
   }
-
 
   // Calcular el porcentaje para las barras de progreso
   const calculatePercentage = (current, goal) => {
