@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +42,7 @@ export function NavBar() {
           </Button>
           <Button className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-300 rounded-full px-6">
             Comprar Ahora
+            <ArrowRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>

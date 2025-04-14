@@ -404,9 +404,9 @@ export default function HealthStatsDashboard({ userData }) {
                   <CardDescription>Historial de los últimos 30 días</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+                  {/*<div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
                     <p className="text-gray-400">Gráfico de presión arterial</p>
-                  </div>
+                  </div> */}
                   <div className="mt-4 grid grid-cols-2 gap-4">
                     <div className="bg-gray-50 p-3 rounded-lg">
                       <div className="text-sm text-gray-500 mb-1">Sistólica</div>

@@ -13,6 +13,11 @@ export default function ChatInterface() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat()
   const messagesEndRef = useRef(null)
   const [inputRows, setInputRows] = useState(1)
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -35,6 +40,7 @@ export default function ChatInterface() {
       onSubmit(e)
     }
   }
+  if (!hasMounted) return null 
 
   return (
     <Card className="w-full max-w-4xl mx-auto shadow-lg border-gray-200 mt-2">
@@ -74,30 +80,32 @@ export default function ChatInterface() {
                   >
                     {message.role === "assistant" ? (
                       <ReactMarkdown
-                        className="prose prose-sm max-w-none"
-                        components={{
-                          a: ({ node, ...props }) => (
-                            <a
-                              {...props}
-                              className="text-blue-600 hover:underline"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            />
+                      components={{
+                        a: ({ node, ...props }) => (
+                          <a
+                            {...props}
+                            className="text-blue-600 hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          />
+                        ),
+                        p: ({ node, ...props }) => <p {...props} className="mb-2 text-sm" />, // Add custom styles here
+                        ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-4 mb-2 text-sm" />,
+                        ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-4 mb-2 text-sm" />,
+                        li: ({ node, ...props }) => <li {...props} className="mb-1 text-sm" />,
+                        code: ({ node, inline, ...props }) =>
+                          inline ? (
+                            <code {...props} className="bg-gray-200 px-1 py-0.5 rounded text-sm" />
+                          ) : (
+                            <pre className="bg-gray-200 p-2 rounded text-sm overflow-x-auto">
+                              <code {...props} />
+                            </pre>
                           ),
-                          p: ({ node, ...props }) => <p {...props} className="mb-2" />,
-                          ul: ({ node, ...props }) => <ul {...props} className="list-disc pl-4 mb-2" />,
-                          ol: ({ node, ...props }) => <ol {...props} className="list-decimal pl-4 mb-2" />,
-                          li: ({ node, ...props }) => <li {...props} className="mb-1" />,
-                          code: ({ node, inline, ...props }) =>
-                            inline ? (
-                              <code {...props} className="bg-gray-200 px-1 py-0.5 rounded text-sm" />
-                            ) : (
-                              <code {...props} className="block bg-gray-200 p-2 rounded text-sm overflow-x-auto" />
-                            ),
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                    
                     ) : (
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     )}
