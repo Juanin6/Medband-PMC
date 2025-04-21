@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "../firebase/config";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -124,6 +125,11 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            <Link href="/sign-up" className="text-sm hover:underline group">
+            <span className="text-gradient opacity-100  transition-opacity duration-500">
+                    Don't have an account ?
+                  </span>
+                  </Link>
           </CardContent>
           <CardFooter>
             <Button
@@ -133,6 +139,7 @@ export default function LoginForm() {
             >
               {loading ? "Logging in..." : "Sign in"}
             </Button>
+            
           </CardFooter>
         </form>
       </Card>
