@@ -127,7 +127,7 @@ export default function LoginForm() {
             </div>
             <Link href="/sign-up" className="text-sm hover:underline group">
             <span className="text-gradient opacity-100  transition-opacity duration-500">
-                    Don't have an account ?
+            Don&apos;t have an account ?
                   </span>
                   </Link>
           </CardContent>
