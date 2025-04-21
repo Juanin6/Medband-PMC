@@ -36,9 +36,9 @@ export function NavBar() {
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
-            className="hidden md:flex border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
+            className=" border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300"
           >
-            <Link href="/login">Iniciar Sesion</Link>
+            <Link href="/sign-in">Iniciar Sesion</Link>
           </Button>
           <Button className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-300 rounded-full px-6">
             Comprar Ahora

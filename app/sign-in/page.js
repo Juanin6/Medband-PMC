@@ -16,12 +16,15 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { auth } from "../firebase/config";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
@@ -45,22 +48,23 @@ export default function LoginForm() {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // In a real application, you would make an API call here
-      console.log("Login attempt with:", { email, password });
-
-      // Simulate successful login
-      alert("Login successful!");
-      router.push("/dashboard/chat");
-      // Reset form
-      setEmail("");
-      setPassword("");
-    } catch (err) {
+      const res = await signInWithEmailAndPassword(email, password);
+      console.log({ res });
+      if (res) {
+        // Simulate successful login
+        alert("Login successful!");
+        router.push("/dashboard/chat");
+        // Reset form
+        setEmail("");
+        setPassword("");
+      }
+      else{
+        setLoading(false)
+        setError("Invalid email or password")
+      }
+    } catch (e) {
       setError("An error occurred during login");
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error(e);
     }
   };
 
@@ -74,7 +78,7 @@ export default function LoginForm() {
       <Card className="w-full max-w-md z-10 border-2 ">
         <CardHeader>
           <CardTitle className="text-2xl">
-            <span className="text-gradient">Login</span>
+            <span className="text-gradient">Sign in</span>
           </CardTitle>
           <CardDescription>
             <span className="text-slate-500  leading-relaxed">

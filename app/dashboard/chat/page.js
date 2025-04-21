@@ -6,17 +6,86 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Sparkles, Send, User, Bot, Loader2 } from "lucide-react"
+import { Sparkles, Send, User, Bot, Loader2, ChartNoAxesColumnIcon } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { auth, db } from "@/app/firebase/config"
+import { useRouter } from "next/navigation"
+import { doc, getDoc } from "firebase/firestore"
 
 export default function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat()
+  const { messages, input,setMessages, handleInputChange, isLoading, error } = useChat()
   const messagesEndRef = useRef(null)
   const [inputRows, setInputRows] = useState(1)
   const [hasMounted, setHasMounted] = useState(false)
+  const [user,loading] = useAuthState(auth)
+  const [userData, setUserData] = useState(null)
+  const router = useRouter();
+  
+
+  const buildPrompt = () => {
+    console.log("Entrando a buildPrompt")
+    console.log(userData)
+    if (!userData) return input
+  
+    const diseases = userData.chronicConditions?.map(d => `- ${d}`).join("\n") || "Ninguna"
+    const meds = userData.currentMedications?.map(m => `- ${m}`).join("\n") || "Ninguna"
+    const vaccines = userData.vaccinations
+      ? Object.entries(userData.vaccinations)
+          .map(([name, val]) => `- ${name}: ${val}`)
+          .join("\n")
+      : "Sin información"
+  
+      return `
+Hola. A continuación, te doy mi información personal y médica para que la uses en todas tus respuestas. Por favor, tenla en cuenta siempre que te pregunte algo:
+
+- Me llamo ${userData.username}.
+- Mido ${userData.height} cm y peso ${userData.weight} kg.
+- Tengo las siguientes enfermedades crónicas:
+${diseases}
+- Estoy tomando estos medicamentos actualmente:
+${meds}
+- Estas son mis vacunas (true si la tengo, false si no):
+${vaccines}
+
+Ahora, mi pregunta es:
+${input}
+`.trim()
+  }
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        const docRef = doc(db, "users", user.uid)
+        const docSnap = await getDoc(docRef)
+        console.log("docSnap", docSnap)
+        if (docSnap.exists()) {
+          setUserData(docSnap.data())
+        } else {
+          console.log("No user document found.")
+        }
+      }
+    }
+  
+    fetchUserData()
+  }, [hasMounted])
+
+  
+  
+  useEffect(()=>{
+    if(!user){
+      router.push("/sign-in")
+    } else{
+      
+    }
+
+  })
+  
+    
 
   useEffect(() => {
     setHasMounted(true)
+   
   }, [])
 
   useEffect(() => {
@@ -28,11 +97,56 @@ export default function ChatInterface() {
     setInputRows(Math.min(5, Math.max(1, rows)))
   }, [input])
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     if (input.trim() === "" || isLoading) return
-    handleSubmit(e)
+  
+    const prompt = buildPrompt()
+  
+    // Mostrar mensaje del usuario
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now().toString(), role: "user", content: input }
+    ])
+  
+    // Limpiar el input
+    handleInputChange({ target: { value: "" } })
+  
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: prompt }]
+        }),
+      })
+  
+      if (!res.ok) throw new Error("Error de red")
+  
+      const data = await res.json()
+  
+      // Mostrar la respuesta del asistente
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString() + "-bot",
+          role: "assistant",
+          content: data.message || "No se pudo generar una respuesta."
+        }
+      ])
+    } catch (err) {
+      console.error("Error fetching from API:", err)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString() + "-error",
+          role: "assistant",
+          content: "Hubo un problema al contactar al asistente. Intenta de nuevo."
+        }
+      ])
+    }
   }
+  
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
