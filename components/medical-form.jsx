@@ -14,13 +14,14 @@ import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "@/app/firebase/config"
-import { doc, updateDoc } from "firebase/firestore"
+import { doc, getDoc, updateDoc } from "firebase/firestore"
 
 export default function MedicalForm() {
   const [activeTab, setActiveTab] = useState("personal")
   const [formProgress, setFormProgress] = useState(0)
   const router = useRouter();
   const [user] = useAuthState(auth)
+  const [completed,setCompleted] = useState(false)
   console.log(user)
   const [formData, setFormData] = useState({
     // Información personal
@@ -91,6 +92,27 @@ export default function MedicalForm() {
     vaccinations: 100,
     
   }
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        const docRef = doc(db, "users", user.uid)
+        const docSnap = await getDoc(docRef)
+        console.log("docSnap", docSnap)
+        if (docSnap.exists()) {
+          console.log(docSnap.data().firstName)
+          if(docSnap.data().firstName!=""){
+            console.log("I ente")
+            setCompleted(true)
+          }
+        } else {
+          console.log("No user document found.")
+        }
+      }
+    }
+  
+    fetchUserData()
+  }, [])
 
   
 
@@ -175,6 +197,7 @@ export default function MedicalForm() {
     }
   }
 
+
   // Función para navegar a la pestaña anterior
   const goToPrevTab = () => {
     const tabs = ["personal", "medical", "family", "medications", "lifestyle", "symptoms", "vaccinations", "insurance"]
@@ -235,6 +258,7 @@ export default function MedicalForm() {
     })
     
     
+    
 
 
 
@@ -274,6 +298,16 @@ export default function MedicalForm() {
       </div>
     )
   }
+
+  if(completed)
+      return (
+    <div className="flex flex-col items-center justify-center  ">
+  <h2 className="text-3xl text-gradient mb-4">
+    Gracias por completar el formulario, sus datos han sido registrados
+  </h2>
+  <Button onClick={() => setCompleted(false)}>Cambiar mis datos</Button>
+</div>
+    )
 
   return (
     <div className="w-full max-w-5xl mx-auto">

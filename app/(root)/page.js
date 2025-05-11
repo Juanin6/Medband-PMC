@@ -23,6 +23,7 @@ import {
 export default function MedicalLandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-50/50 via-white to-blue-50/50">
+      <title>Medband</title>
       <section className="w-full py-16 md:py-24 lg:py-32 overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-white pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-blue-200 mix-blend-multiply blur-3xl opacity-30 animate-blob"></div>
