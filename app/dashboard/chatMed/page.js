@@ -29,7 +29,7 @@ export default function ChatInterface() {
   const [user, loading] = useAuthState(auth);
   const [userData, setUserData] = useState(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
+  
 
   const buildPrompt = () => {
     console.log("Entrando a buildPrompt");
